@@ -1,0 +1,72 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package assigment.degree;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import java.util.Random;
+/**
+ *
+ * @author User
+ */
+class Registration {
+    
+    private static final String ID_PREFIX = "TP"; // Prefix for UserID
+    private static final int ID_LENGTH = 5; // Length of the numeric part
+    
+    // Method to validate email format using regex
+    public boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        return email.matches(emailRegex);
+    }
+
+    // Method to check if an email already exists in the registration file
+    public boolean isEmailExists(String email) {
+        try (BufferedReader br = new BufferedReader(new FileReader("Registration.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 4 && parts[3].trim().equalsIgnoreCase(email)) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Method to generate a unique UserID
+    public String generateUserId() {
+        String userId;
+        do {
+            Random random = new Random();
+            int numberPart = random.nextInt(100000); // Generate a random number between 0 and 99999
+            String formattedNumber = String.format("%05d", numberPart); // Format to ensure leading zeros
+            userId = ID_PREFIX + formattedNumber; // Combine prefix and number
+        } while (isUserIdExists(userId)); // Check if UserID already exists
+        return userId;
+    }
+
+    // Method to check if the UserID already exists in the registration file
+    private boolean isUserIdExists(String userId) {
+        try (BufferedReader br = new BufferedReader(new FileReader("Registration.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 1 && parts[0].trim().equals(userId)) {
+                    return true; // UserID exists
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error Repeated UserID");
+            e.printStackTrace();
+        }
+        return false; // UserID does not exist
+    }
+}
